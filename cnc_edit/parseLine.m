@@ -1,5 +1,8 @@
 function [lineStruct] = parseLine(programLine)
-    lineStruct.type = [];
+% Converts a character g code line to a structure with pertinent information
+
+% intiialize variables
+lineStruct.type = [];
     lineStruct.tail = [];
     lineStruct.lineNum = [];
     lineStruct.gNum = [];
@@ -40,15 +43,6 @@ end
 
 
 for i = 1:length(programLine)
-    
-%     if programLine(i) == ';' || programLine(i) =='(' % if commented, comment to end of line and ignore rest)
-%         if i ==1 
-%             lineStruct.type = 'comment';
-%         else
-%             lineStruct.tail = ' ';
-%         end
-%         lineStruct.tail = [lineStruct.tail,programLine(i:length(programLine))]; % Commented section returned, only works for line comments, no closure
-%         return
     if programLine(i) == 'N'
         lineNum = getCodeNum(programLine,i);
         lineStruct.lineNum = lineNum;

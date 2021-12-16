@@ -1,5 +1,7 @@
 function [value] = getVal2(line,i)
-    % i is index of code (x,y,z,...)
+    % Revised formatting.  (no longer split string)
+    % line is a string containing one line of code
+    % i is index within the string of the code identifier (x,y,z,...). 
     splitStr = strsplit(line(i+1:end),' '); % Split by spaces after code character
     if isempty(splitStr{1}) % first string is empty if starts with a space
         testString = splitStr{2};
