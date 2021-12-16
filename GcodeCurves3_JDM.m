@@ -11,41 +11,45 @@ close all
 % need to be specified 
 
 % Rotation Direction: G02 = CW,  G03 = CCW
-codeDir = 'G03';
-r = 250;  %[mm]
+codeDir = 'G02';
+r = 55;  %[mm]
 
 % Codes1 = input('line1: ','s');
 % Codes2 = input('line2: ','s');
 % codeDir = input('codeDir: ','s');
 % r = input('codeDir: ','s');
 
-Codes1 = ('N0310 G01  X = -1225.791 Y = 860.652 Z = -15 B = 20.445 C = 756.577');
-Codes2 = ('N0350 G03  X = -1467.525 Y = 804.077 Z = -58.489 B = 30.078 C = 696.25 I-71.416 J-239.583 (R=250))');
+Codes1 = ('N0230 G01 X=-1273.301 Y=268.064 Z=-85.000 B=0.944 C=54.370');
+Codes2 = ('N0240 G02 X=-1218.209 Y=310.920 Z=-40.909 B=0.944 C=131.197 I=53.601 J=-12.125 ;r=55');
 %  
 % (actuate top rear)
 % N0730 M56
+%N0230 G01 X=-1273.301 Y=268.064 Z=-85.000 B=0.944 C=54.370
+%N0240 G01 X=-1218.209 Y=313.920 Z=-50.000 B=0.944 C=131.197 ;r=55
 % 
-% ( N0734 G03  X = -1421.400 Y = 498.130 Z = -46.720 B = 30.202 C = -119.498 )
 % 
-% 
+
+[lineStruct] = parseLine(Codes1)
+[lineStruct] = parseLine(Codes2)
+
 Codes1 = strsplit(Codes1,' ');
 Codes2 = strsplit(Codes2,' ');
 for i = 1: length(Codes1)
     CodeTemp = Codes1{i};
     CodeIndicator = CodeTemp(1);
     if CodeIndicator == 'X'
-        x1 = getVal(Codes1,i);
+        x1 = getVal2(Codes1,i);
     elseif CodeIndicator == 'Y'
-        y1 = getVal(Codes1,i);
+        y1 = getVal2(Codes1,i);
     end
 end
 for i = 1: length(Codes2)
     CodeTemp = Codes2{i};
     CodeIndicator = CodeTemp(1);
     if CodeIndicator == 'X'
-        x2 = getVal(Codes2,i);
+        x2 = getVal2(Codes2,i);
     elseif CodeIndicator == 'Y'
-        y2 = getVal(Codes2,i);
+        y2 = getVal2(Codes2,i);
     end
 end
     
