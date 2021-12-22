@@ -2,6 +2,7 @@
 % clear
 % close all
 function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues)
+% cd Z:\equip\QTC\Programs
 % addpath('U:\My Documents\GitHub\QTC-code-modification')
 % addpath('U:\My Documents\GitHub\QTC-code-modification\cnc_edit')
 % QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[])

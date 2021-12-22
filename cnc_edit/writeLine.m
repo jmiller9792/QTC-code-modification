@@ -21,7 +21,13 @@ function [lineNew] = writeLine(lineStruct)
             if ~isempty(i.coord)
                 coordList = fieldnames(i.coord);
                 for j = 1:length(coordList)
-                    lineNew = [lineNew,' ',coordList{j},'=',num2str(i.coord.(coordList{j}),'%.3f')];
+                    if ~isnan(i.coord.(coordList{j})) 
+                        lineNew = [lineNew,' ',coordList{j},'=',num2str(i.coord.(coordList{j}),'%.3f')];
+                    else
+                        disp(['error non-numeric line: ',i.lineNum, ' ', coordList{j}])
+                        return
+                    end
+                    
                 end
             end
         end
