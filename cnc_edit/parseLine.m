@@ -71,6 +71,14 @@ for i = 1:length(programLine)
             lineStruct.type = 'setDecel';
             lineStruct.tail = programLine(i:end);
             return
+        elseif strcmp(gNum,'17')
+            lineStruct.type = 'setInterpPlaneXY';
+            lineStruct.tail = [' ',programLine(i:end)];
+            return
+        elseif strcmp(gNum,'19')
+            lineStruct.type = 'setInterpPlaneYZ';
+            lineStruct.tail =  [' ',programLine(i:end)];
+            return
         else
             disp('G code not recognized');
         end
@@ -89,6 +97,8 @@ for i = 1:length(programLine)
                 lineStruct.coord.I = getVal2(programLine,j);
             elseif programLine(j) == 'J'
                 lineStruct.coord.J = getVal2(programLine,j);
+            elseif programLine(j) == 'K'
+                lineStruct.coord.K = getVal2(programLine,j);
             end
         end
     elseif programLine(i) == 'M'

@@ -2,6 +2,8 @@
 % clear
 % close all
 function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues)
+% addpath('U:\My Documents\GitHub\QTC-code-modification')
+% addpath('U:\My Documents\GitHub\QTC-code-modification\cnc_edit')
 % QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[])
 
 
@@ -9,7 +11,7 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 %    Use same function for c consistency as for offset correction?
 
 %Paths for files and functions
-addpath('cnc_edit');
+% addpath('cnc_edit');
 % addpath('Z:\equip\QTC\Programming_Editors\latestQTCprgs');
 
 % %import file to be altered

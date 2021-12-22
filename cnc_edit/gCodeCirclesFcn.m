@@ -1,14 +1,10 @@
 function [line] = gCodeCirclesFcn(line,plotBool)
+
+errorAccept = 0.01; 
 % % 
-% commentStyle ='('
 % This code determines the center of the circle of rotation for a G03 or
 % G02 line of G-code. Using I and J values is just one of several ways to
 % define an arc.
-
-% A better implementation would allow either pasting of multiple lines
-% without needing to assign specific lines of code.  AND/OR code should read
-% and entire file and check for issues (any changes to radius would still 
-% need to be specified 
 
 % Rotation Direction: G02 = CW,  G03 = CCW
 
@@ -19,7 +15,6 @@ elseif strcmp(line.type,'ccwCircle')
 else
     return
 end
-
 
 x1 = line.coordLast.X;
 y1 = line.coordLast.Y;
@@ -45,7 +40,7 @@ if ~isempty(line.coord.I) % If already specified, check that radius is consisten
     rad2start = sqrt((x1-xcCurrent)^2+(y1-ycCurrent)^2);
     rad2end = sqrt((xcCurrent-x2)^2+(ycCurrent-y2)^2);
     % if center point is not equal distant from points
-    errorAccept = 0.04;   
+      
     if abs(rad2start-rad2end) > errorAccept% || abs(rad2end-r) > errorAccept
         % If unacceptable error, display actual radii
         disp('Radii do not match')
@@ -62,7 +57,6 @@ end
 
 % Radius (make sure it is big enough to span the two points)
 d = sqrt((x1-x2)^2+(y1-y2)^2);
-% if (2*r^2) < d
 if (2*r) <= d
    disp('You done messed up. Make the radius bigger')
    return
@@ -82,8 +76,7 @@ xC1 = double(T(1));
 xC2 = double(T(2));
 yC1 = m_mid*xC1 + b_mid;
 yC2 = m_mid*xC2 + b_mid;
-% vpa(xc,100)
-% vpa(yc,100)
+
 % test(1) = r == sqrt((xc-x1)^2 + (yc-y1)^2);
 % test(2) = yc == m_mid*xc + b_mid;
 % circr = @(xc)  r-sqrt((xc-x1)^2 + ((m_mid*xc + b_mid)-y1)^2)
@@ -187,6 +180,7 @@ plot(xy_r(1,:)+xC, xy_r(2,:)+yC)                                % Draw An Arc Of
 % axis([-1.25*radius  1.25*radius    0  1.25*radius])             % Set Axis Limits
 axis equal  % No Distortion With ‘axis equal’
 plot(xcCurrent,ycCurrent,'>')
-plot(xC,yC,'x')
+% plot(xC,yC,'x')
+legend('Start','End','Center','Path','PreviousCenter')
 end
 end
