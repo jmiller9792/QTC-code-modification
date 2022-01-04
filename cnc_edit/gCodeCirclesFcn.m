@@ -49,6 +49,12 @@ if ~isempty(line.coord.I) % If already specified, check that radius is consisten
         disp(['Difference:' num2str(abs(rad2start-rad2end))])
         disp([line.lineNum,' corrected radius collected from comment: ',num2str(r)])
         plotBool = 1;
+    elseif abs(rad2start-r) > 1 || abs(rad2end-r) > 1 % solved values are close for start and end but not equal to specified... uknown reason
+        disp('Radius does not match comment')
+        disp(['Radius to start:' num2str(rad2start)])
+        disp(['Radius to end:' num2str(rad2end)])
+        disp([line.lineNum,' corrected radius collected from comment: ',num2str(r)])
+        plotBool = 1;
     else % if consistent no action necessary
         return
     end
@@ -137,8 +143,8 @@ J = yC-y1;
 line.coord.I = I;
 line.coord.J = J;
 disp(['Solved error = ',num2str(abs(sqrt((x1-xC)^2+(y1-yC)^2)-sqrt((xC-x2)^2+(yC-y2)^2)))])
-disp([num2str(yC),'=',num2str(m_mid*xC + b_mid)])
-disp([num2str(r),'=',num2str(sqrt((xC-x1)^2 + (yC-y1)^2))])
+% disp([num2str(yC),'=',num2str(m_mid*xC + b_mid)])
+% disp([num2str(r),'=',num2str(sqrt((xC-x1)^2 + (yC-y1)^2))])
 
 if plotBool
     
