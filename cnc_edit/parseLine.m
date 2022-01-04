@@ -95,8 +95,14 @@ for i = 1:length(programLine)
                 lineStruct.coord.C = getVal2(programLine,j);
             elseif programLine(j) == 'I'
                 lineStruct.coord.I = getVal2(programLine,j);
+                if ~(strcmp(lineStruct.type,'cwCircle')||strcmp(lineStruct.type,'ccwCircle'))
+                    disp(['Wrong line type',num2str(lineNum)])
+                end                
             elseif programLine(j) == 'J'
                 lineStruct.coord.J = getVal2(programLine,j);
+                if ~(strcmp(lineStruct.type,'cwCircle')||strcmp(lineStruct.type,'ccwCircle'))
+                    disp(['Wrong line type',num2str(lineNum)])
+                end       
             elseif programLine(j) == 'K'
                 lineStruct.coord.K = getVal2(programLine,j);
             end
