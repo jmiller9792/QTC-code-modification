@@ -1,5 +1,5 @@
 function [line] = gCodeCirclesFcn(line,plotBool)
-
+% line
 errorAccept = 0.01; 
 % % 
 % This code determines the center of the circle of rotation for a G03 or
@@ -7,7 +7,6 @@ errorAccept = 0.01;
 % define an arc.
 
 % Rotation Direction: G02 = CW,  G03 = CCW
-
 if strcmp(line.type,'cwCircle')
     codeDir = 'G02';
 elseif strcmp(line.type,'ccwCircle')
@@ -16,10 +15,33 @@ else
     return
 end
 
-x1 = line.coordLast.X;
-y1 = line.coordLast.Y;
-x2 = line.coord.X;
-y2 = line.coord.Y;
+if strcmp(line.circInterp,'xz')
+    x1 = line.coordLast.Z;
+    y1 = line.coordLast.X;
+    x2 = line.coord.Z;
+    y2 = line.coord.X;
+    iCurrent = line.coord.K;
+    jCurrent = line.coord.I;
+elseif strcmp(line.circInterp,'yz')
+    x1 = line.coordLast.Y;
+    y1 = line.coordLast.Z;
+    x2 = line.coord.Y;
+    y2 = line.coord.Z;
+    iCurrent = line.coord.J;
+    jCurrent = line.coord.K;
+else % Default xy
+    x1 = line.coordLast.X;
+    y1 = line.coordLast.Y;
+    x2 = line.coord.X;
+    y2 = line.coord.Y;
+    iCurrent = line.coord.I;
+    jCurrent = line.coord.J;
+end
+
+% x1 = line.coordLast.X;
+% y1 = line.coordLast.Y;
+% x2 = line.coord.X;
+% y2 = line.coord.Y;
 
 % Get radius from line (this is used for quick changes to radius)
 comment = line.tail(2:end);
@@ -33,10 +55,10 @@ else
     return
 end
 
-if ~isempty(line.coord.I) % If already specified, check that radius is consistent
+if ~isempty(iCurrent) % If already specified, check that radius is consistent
     % Find center coordinates
-    xcCurrent = x1+line.coord.I;
-    ycCurrent = y1+line.coord.J;
+    xcCurrent = x1+iCurrent;
+    ycCurrent = y1+jCurrent;
     rad2start = sqrt((x1-xcCurrent)^2+(y1-ycCurrent)^2);
     rad2end = sqrt((xcCurrent-x2)^2+(ycCurrent-y2)^2);
     % if center point is not equal distant from points
@@ -140,53 +162,62 @@ end
 I = xC-x1;
 J = yC-y1;
 % disp(codeDir+ " X" + num2str(x2) + " Y" + num2str(y2) + " I" + num2str(I) + " J" + num2str(J)+ " (R="+ num2str(r)+ ")");
-line.coord.I = I;
-line.coord.J = J;
+% line.coord.I = I;
+% line.coord.J = J;
+if strcmp(line.circInterp,'xz')
+    line.coord.K = I;
+    line.coord.I = J;
+elseif strcmp(line.circInterp,'yz')
+    line.coord.J = I;
+    line.coord.K = J;
+else
+    line.coord.I = I;
+    line.coord.J = J;
+end
+
 disp(['Solved error = ',num2str(abs(sqrt((x1-xC)^2+(y1-yC)^2)-sqrt((xC-x2)^2+(yC-y2)^2)))])
 % disp([num2str(yC),'=',num2str(m_mid*xC + b_mid)])
 % disp([num2str(r),'=',num2str(sqrt((xC-x1)^2 + (yC-y1)^2))])
 
 if plotBool
-    
+    figure()
+    h1 = axes;
+    set(h1, 'Ydir', 'reverse')
+    set(h1, 'Xdir', 'reverse')
+    hold on
+    xlabel('X axis, head movement relative to table');
+    ylabel('Y axis, head movement relative to table');
+    plot(x1,y1,'b+')
+    plot(x2,y2,'r+')
+    plot(xC,yC,'g^')
 
-figure()
-h1 = axes;
-set(h1, 'Ydir', 'reverse')
-set(h1, 'Xdir', 'reverse')
-hold on
-xlabel('X axis, head movement relative to table');
-ylabel('Y axis, head movement relative to table');
-plot(x1,y1,'b+')
-plot(x2,y2,'r+')
-plot(xC,yC,'g^')
-
-radius = r;
-angStart = AngleCalc(x1,y1,xC,yC);
-angEnd = AngleCalc(x2,y2,xC,yC);
-if strcmp(codeDir,'G02')
-    if angEnd>angStart
-        angEnd = angEnd-2*pi;
+    radius = r;
+    angStart = AngleCalc(x1,y1,xC,yC);
+    angEnd = AngleCalc(x2,y2,xC,yC);
+    if strcmp(codeDir,'G02')
+        if angEnd>angStart
+            angEnd = angEnd-2*pi;
+        end
+    else
+        if angEnd<angStart
+            angEnd = angEnd+2*pi;
+        end
     end
-else
-    if angEnd<angStart
-        angEnd = angEnd+2*pi;
-    end
-end
 
-% plotting
-circr = @(radius,rad_ang)  [radius*cos(rad_ang);  radius*sin(rad_ang)];         % Circle Function For Angles In Radians
-circd = @(radius,deg_ang)  [radius*cosd(deg_ang);  radius*sind(deg_ang)];       % Circle Function For Angles In Degrees
-N = 25;                                                         % Number Of Points In Complete Circle
-rad_angl = linspace(angStart,angEnd, N);                             % Angle Defining Arc Segment (radians)
-xy_r = circr(radius,rad_angl);                                    % Matrix (2xN) Of (x,y) Coordinates
-% figure(1)
+    % plotting
+    circr = @(radius,rad_ang)  [radius*cos(rad_ang);  radius*sin(rad_ang)];         % Circle Function For Angles In Radians
+    circd = @(radius,deg_ang)  [radius*cosd(deg_ang);  radius*sind(deg_ang)];       % Circle Function For Angles In Degrees
+    N = 25;                                                         % Number Of Points In Complete Circle
+    rad_angl = linspace(angStart,angEnd, N);                             % Angle Defining Arc Segment (radians)
+    xy_r = circr(radius,rad_angl);                                    % Matrix (2xN) Of (x,y) Coordinates
+    % figure(1)
 
-hold on
-plot(xy_r(1,:)+xC, xy_r(2,:)+yC)                                % Draw An Arc Of Blue Stars
-% axis([-1.25*radius  1.25*radius    0  1.25*radius])             % Set Axis Limits
-axis equal  % No Distortion With ‘axis equal’
-plot(xcCurrent,ycCurrent,'>')
-% plot(xC,yC,'x')
-legend('Start','End','Center','Path','PreviousCenter')
+    hold on
+    plot(xy_r(1,:)+xC, xy_r(2,:)+yC)                                % Draw An Arc Of Blue Stars
+    % axis([-1.25*radius  1.25*radius    0  1.25*radius])             % Set Axis Limits
+    axis equal  % No Distortion With ‘axis equal’
+    plot(xcCurrent,ycCurrent,'>')
+    % plot(xC,yC,'x')
+    legend('Start','End','Center','Path','PreviousCenter')
 end
 end

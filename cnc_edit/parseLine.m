@@ -10,6 +10,7 @@ lineStruct.type = [];
     lineStruct.coord = [];
     lineStruct.feed = [];
     lineStruct.coordLast = [];
+    lineStruct.circInterp = [];
 
 if isempty(programLine) % Create output
     lineStruct.type = 'blank';
@@ -74,10 +75,17 @@ for i = 1:length(programLine)
         elseif strcmp(gNum,'17')
             lineStruct.type = 'setInterpPlaneXY';
             lineStruct.tail = [' ',programLine(i:end)];
+            lineStruct.circInterp = 'xy';
+            return
+        elseif strcmp(gNum,'18')
+            lineStruct.type = 'setInterpPlaneXZ';
+            lineStruct.tail =  [' ',programLine(i:end)];
+            lineStruct.circInterp = 'xz';
             return
         elseif strcmp(gNum,'19')
             lineStruct.type = 'setInterpPlaneYZ';
             lineStruct.tail =  [' ',programLine(i:end)];
+            lineStruct.circInterp = 'yz';
             return
         else
             disp('G code not recognized');
