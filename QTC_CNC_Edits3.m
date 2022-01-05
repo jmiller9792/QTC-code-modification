@@ -39,9 +39,33 @@ end
 %% Split into lines
 progLines = strtrim(strsplit(prog,'\n'));
 lastCoord = [];
+circInterpLast = [];
 for i = 1:length(progLines)
     temp = parseLine(progLines{i});
     lineStruct(i) = temp;
+    
+    % if line assigns circular interpolation, store for following lines.
+    % If not yet specified, assign xy circular by default
+    if ~isempty(lineStruct(i).gNum) % if gNum is specified in a given line
+        if strcmp(lineStruct(i).gNum,'17') || strcmp(lineStruct(i).gNum,'18')||...
+                strcmp(lineStruct(i).gNum,'19') % check if new circular interpolation
+            
+            circInterpLast = lineStruct(i).circInterp;
+        
+        else % if no new ciruclar interpolation
+            if isempty(circInterpLast) %and none exists, set default
+                circInterpLast = 'xy';
+                lineStruct(i).circInterp = circInterpLast;
+
+            else % otherwise take previous
+                lineStruct(i).circInterp = circInterpLast;
+
+            end
+        end
+    %else not included because it interpolation is not necessary for
+    %non G codes
+    end
+    
     if ~isempty(lineStruct(i).coord)
         lineStruct(i).coordLast = lastCoord;
     	lastCoord = lineStruct(i).coord;
@@ -65,16 +89,18 @@ end
 % to achieve the rotation up to 180deg
 if cConsistency
     c_previous = 0; % Start at C = 0deg
-    for i = lineStruct
-        if isfield(i.coord,'C')
-            c_current = i.coord.C;
+    for i = 1:length(lineStruct)
+        if isfield(lineStruct(i).coord,'C')
+            c_current = lineStruct(i).coord.C;
             c_dif = mod(c_current-c_previous,360); % Remove extra rotations from difference
             if c_dif>180
                 c_dif = c_dif-360; % Change range of difference to +-180 deg (may not work??)
             end
-            i.coord.C = c_previous+c_dif;
+            lineStruct(i).coord.C = c_previous+c_dif;
+            c_previous = lineStruct(i).coord.C;
         end
     end
+    
 end
 
 %% Offset Correction
