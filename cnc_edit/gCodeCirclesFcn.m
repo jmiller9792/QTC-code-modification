@@ -51,7 +51,7 @@ if ~isempty(rIndex)
     r = getVal2(comment,rIndex);
     
 else
-    disp([line.lineNum,'No radius found'])
+    disp([line.lineNum,' ERROR: No radius found'])
     return
 end
 
@@ -86,7 +86,7 @@ end
 % Radius (make sure it is big enough to span the two points)
 d = sqrt((x1-x2)^2+(y1-y2)^2);
 if (2*r) <= d
-   disp('You done messed up. Make the radius bigger')
+   disp('ERROR: You done messed up. Make the radius bigger')
    return
 end
 
