@@ -5,6 +5,10 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % cd Z:\equip\QTC\Programs
 % addpath('U:\My Documents\GitHub\QTC-code-modification')
 % addpath('U:\My Documents\GitHub\QTC-code-modification\cnc_edit')
+% or
+% addpath('C:\Users\jmill\OneDrive - purdue.edu\Documents\GitHub\QTC-code-modification')
+% addpath('C:\Users\jmill\OneDrive - purdue.edu\Documents\GitHub\QTC-code-modification\cnc_edit')
+
 % QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[])
 
 
@@ -23,9 +27,9 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % lineNumbering = 0;
 % cConsistency = 0;
 % offsetCorrBool = 0;
-
+disp('Reading File')
 prog = fileread(originalFileName);
-
+disp('File successfully read')
 %% CommentFlip
 indexComment = strfind(prog,';');
 for i = indexComment
@@ -35,7 +39,7 @@ indexCommentClose = strfind(prog,')');
 for i = indexCommentClose
     prog(i) = ' ';
 end
-
+disp('Comments adjusted')
 %% Split into lines
 progLines = strtrim(strsplit(prog,'\n'));
 lastCoord = [];
@@ -47,7 +51,7 @@ for i = 1:length(progLines)
     	lastCoord = lineStruct(i).coord;
     end
 end
-    
+disp('Program split into lines')    
 %% Correct Line Numbers (Only uncommented lines. may not even be necessary in QTC)
 if lineNumbering
     lineNum = 0;
@@ -59,11 +63,12 @@ if lineNumbering
         lineNum = lineNum+10;
     end
 end
-
+disp('Line numbers corrected')
 %% Fix C rotations
 % C value can be anything but the machine will move the shortest distance
 % to achieve the rotation up to 180deg
 if cConsistency
+    disp('Fixing C Rotations')
     c_previous = 0; % Start at C = 0deg
     for i = lineStruct
         if isfield(i.coord,'C')
@@ -80,12 +85,14 @@ end
 %% Offset Correction
 % if offsetCorrBool
 if ~isempty(offsetIndices)
+    disp('Performing offsets')
     for i = 1:length(offsetIndices)
         lineStruct = offsetCorrection(lineStruct,offsetIndices(i),offsetValues(i));
     end
 end
 
 %% Create output string\
+disp('Generating ouput string')
 progMod = [];
 for i = lineStruct
     lineNew = writeLine(i);
@@ -110,6 +117,7 @@ if strcmp(modifiedFileName(1:2),'nx') % if new file name has nx prefix, remove. 
     modifiedFileName = modifiedFileName(3:end);
 end
 %% write new file
+disp('Writing new files')
 fileID = fopen(modifiedFileName,'w');
 fprintf(fileID,'%s\n',progMod);
 fclose(fileID);
