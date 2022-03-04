@@ -55,6 +55,7 @@ else
     return
 end
 
+
 if ~isempty(iCurrent) % If already specified, check that radius is consistent
     % Find center coordinates
     xcCurrent = x1+iCurrent;
@@ -81,6 +82,7 @@ if ~isempty(iCurrent) % If already specified, check that radius is consistent
         return
     end
     
+
 end
 
 % Radius (make sure it is big enough to span the two points)
@@ -94,70 +96,48 @@ x_m = (x2+x1)/2;
 y_m = (y2+y1)/2;
 m_mid = -(x2-x1)/(y2-y1); %perpendicular to chord between start and end points
 
-b_mid = y_m-m_mid*x_m;
-% ymcheck = m_mid*x_m+b_mid
-
-syms xc yc
-test = r-sqrt((xc-x1)^2 + ((m_mid*xc + b_mid)-y1)^2);
-T = solve(test,xc);
-xC1 = double(T(1));
-xC2 = double(T(2));
-yC1 = m_mid*xC1 + b_mid;
-yC2 = m_mid*xC2 + b_mid;
-
-% test(1) = r == sqrt((xc-x1)^2 + (yc-y1)^2);
-% test(2) = yc == m_mid*xc + b_mid;
-% circr = @(xc)  r-sqrt((xc-x1)^2 + ((m_mid*xc + b_mid)-y1)^2)
-
-% T = solve(test,[xc;yc])
-
-% xC1 = double(T.xc(1));
-% yC1 = double(T.yc(1));
-% xC2 = double(T.xc(2));
-% yC2 = double(T.yc(2));
 
 
-[theta_center1,~] = cart2pol(xC1-x1,yC1-y1);
-[theta_center2,~] = cart2pol(xC2-x1,yC2-y1);
-[theta2,~] = cart2pol(x2-x1,y2-y1);
+    % Radius (make sure it is big enough to span the two points)
+    d = sqrt((x1-x2)^2+(y1-y2)^2);
+    if (2*r) <= d
+       disp('You done messed up. Make the radius bigger')
+       return
+    end
 
-thetadif1=theta_center1-theta2;
-thetadif2=theta_center2-theta2;
+    x_m = (x2+x1)/2;
+    y_m = (y2+y1)/2;
+    m_mid = -(x2-x1)/(y2-y1); %perpendicular to chord between start and end points
 
-%Correct for out of bounds values
-if thetadif1>=pi/2
-    thetadif1 = thetadif1-2*pi;
-elseif thetadif1<=-pi/2
-    thetadif1 = thetadif1+2*pi;
-end
+    b_mid = y_m-m_mid*x_m;
+    % ymcheck = m_mid*x_m+b_mid
 
-if thetadif2>=pi/2
-    thetadif2 = thetadif2-2*pi;
-elseif thetadif2<=-pi/2
-    thetadif2 = thetadif2+2*pi;
-end
+    syms xc yc
+    test = r-sqrt((xc-x1)^2 + ((m_mid*xc + b_mid)-y1)^2);
+    T = solve(test,xc);
+    xC1 = double(T(1));
+    xC2 = double(T(2));
+    yC1 = m_mid*xC1 + b_mid;
+    yC2 = m_mid*xC2 + b_mid;
 
-% Determine which solution corresponds to which direction
-if thetadif1>=0
-    xC_g03 = xC1;
-    yC_g03 = yC1;
-    xC_g02 = xC2;
-    yC_g02 = yC2;
-else
-    xC_g02 = xC1;
-    yC_g02 = yC1;
-    xC_g03 = xC2;
-    yC_g03 = yC2;    
-end
+    % test(1) = r == sqrt((xc-x1)^2 + (yc-y1)^2);
+    % test(2) = yc == m_mid*xc + b_mid;
+    % circr = @(xc)  r-sqrt((xc-x1)^2 + ((m_mid*xc + b_mid)-y1)^2)
 
-% Assign 
-if strcmp(codeDir,'G02')
-    xC = xC_g02;
-    yC = yC_g02;
-else
-    xC = xC_g03;
-    yC = yC_g03;
-end
+    % T = solve(test,[xc;yc])
+
+    % xC1 = double(T.xc(1));
+    % yC1 = double(T.yc(1));
+    % xC2 = double(T.xc(2));
+    % yC2 = double(T.yc(2));
+
+
+    [theta_center1,~] = cart2pol(xC1-x1,yC1-y1);
+    [theta_center2,~] = cart2pol(xC2-x1,yC2-y1);
+    [theta2,~] = cart2pol(x2-x1,y2-y1);
+
+    thetadif1=theta_center1-theta2;
+    thetadif2=theta_center2-theta2;
 
 I = xC-x1;
 J = yC-y1;
@@ -220,4 +200,5 @@ if plotBool
     % plot(xC,yC,'x')
     legend('Start','End','Center','Path','PreviousCenter')
 end
+
 end
