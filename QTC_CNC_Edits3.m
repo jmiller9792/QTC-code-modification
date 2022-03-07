@@ -130,6 +130,8 @@ for i = lineStruct
 end
 
 %% Apply syntax and filename corrections
+returns = strfind(progMod,10); %carriage returns
+
 header = ['def local path_synch USINT Cnc_X' char(13) char(10)...
     '%001' char(13) char(10)...
     '(SETUP' char(13) char(10)...
@@ -138,6 +140,9 @@ header = ['def local path_synch USINT Cnc_X' char(13) char(10)...
 
 if strcmp(originalFileName(1:2),'nx') % if original file is from nx, add header.  Will be removed from output nx version
     progMod = [header,progMod];
+else % for some reason, there is an error reading the first line which leads to errors writing.  
+    progMod = progMod(returns(1)+1:end); % Brute force remove first line
+    progMod = ['def local path_synch USINT Cnc_X' char(13) char(10) progMod]; % Brute force add correct first line
 end
 if strcmp(modifiedFileName(1:2),'nx') % if new file name has nx prefix, remove.  This will be added later
     modifiedFileName = modifiedFileName(3:end);
@@ -154,8 +159,8 @@ for i = indexComment
     progMod(i) = ';';
 end
     
-returns = strfind(progMod,10);
-progMod = progMod(returns(5)+1:end);
+
+progMod = progMod(returns(5)+1:end); % crop from character after fifth carriage return to end
 fileID = fopen(['nx',modifiedFileName],'w');
 fprintf(fileID,'%s\n',progMod);
 fclose(fileID);
