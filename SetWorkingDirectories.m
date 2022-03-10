@@ -1,6 +1,6 @@
 
 computer = 'JDMLaptop';
-
+computer = 'Home';
 cd Z:\equip\QTC\Programs
 
 if strcmp(computer,'JDMLaptop')
@@ -9,6 +9,9 @@ if strcmp(computer,'JDMLaptop')
 elseif strcmp(computer,'Purdue')
     addpath('U:\My Documents\GitHub\QTC-code-modification')
     addpath('U:\My Documents\GitHub\QTC-code-modification\cnc_edit')
+elseif strcmp(computer,'Home')    
+    addpath('C:\Users\Justin\Documents\GitHub\QTC-code-modification')
+    addpath('C:\Users\Justin\Documents\GitHub\QTC-code-modification\cnc_edit')
 end
 
 
