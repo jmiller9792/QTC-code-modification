@@ -159,7 +159,7 @@ for i = indexComment
     progMod(i) = ';';
 end
     
-
+returns = strfind(progMod,10); %carriage returns (reset due to changes in header)
 progMod = progMod(returns(5)+1:end); % crop from character after fifth carriage return to end
 fileID = fopen(['nx',modifiedFileName],'w');
 fprintf(fileID,'%s\n',progMod);
