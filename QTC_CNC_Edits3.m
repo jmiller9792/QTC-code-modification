@@ -42,7 +42,10 @@ end
 disp('Comments adjusted')
 %% Split into lines
 progLines = strtrim(strsplit(prog,'\n'));
-lastCoord = [];
+% lastCoord = [];
+lastCoord.X = 0;
+lastCoord.Y = 0;
+lastCoord.Z = 0;
 circInterpLast = [];
 for i = 1:length(progLines)
     temp = parseLine(progLines{i});
@@ -70,9 +73,23 @@ for i = 1:length(progLines)
     %non G codes
     end
     
-    if ~isempty(lineStruct(i).coord)
-        lineStruct(i).coordLast = lastCoord;
-    	lastCoord = lineStruct(i).coord;
+    if ~isempty(lineStruct(i).coord) % if line has coordinate contents, otherwise do not update last coordinate
+        lineStruct(i).coordLast = lastCoord; % Make previous coordinate accessible to current line (for ciruclar interp
+%         lineStruct(i).coordLast = lastCoord;
+%     	lastCoord = lineStruct(i).coord;
+        
+        % If coordinate is specified previously but not in current line, add it to current line
+        if ~isfield(lineStruct(i).coord,'X')
+            lineStruct(i).coord.X = lastCoord.X;
+        end
+        if ~isfield(lineStruct(i).coord,'Y')
+            lineStruct(i).coord.Y = lastCoord.Y;
+        end
+        if ~isfield(lineStruct(i).coord,'Z')
+            lineStruct(i).coord.Z = lastCoord.Z;
+        end
+        % Save current coordinate to be available for next line
+        lastCoord = lineStruct(i).coord;
     end
 end
 disp('Program split into lines')    
