@@ -65,7 +65,7 @@ if ~isempty(iCurrent) % If i and j already specified, check that radius is consi
         disp('Radii do not match')
         disp(['Radius to start:' num2str(rad2start)])
         disp(['Radius to end:' num2str(rad2end)])
-        disp(['Difference:' num2str(abs(rad2start-rad2end))])
+        disp(['Difference:' num2str(abs(rad2start-rad2end))]);
         disp([line.lineNum,' corrected radius collected from comment: ',num2str(r)])
         plotBool = 1;
     elseif abs(rad2start-r) > 1 || abs(rad2end-r) > 1 % solved values are close for start and end but not equal to specified... uknown reason
