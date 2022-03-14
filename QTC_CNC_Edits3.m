@@ -182,6 +182,3 @@ fileID = fopen(['nx',modifiedFileName],'w');
 fprintf(fileID,'%s\n',progMod);
 fclose(fileID);
 end
-%% Functions
-
-

@@ -233,7 +233,7 @@ if plotBool
     axis equal  % No Distortion With ‘axis equal’
     plot(xcCurrent,ycCurrent,'>')
     % plot(xC,yC,'x')
-    legend('Start','End','Center','Path','PreviousCenter')
+    legend('Start','End','Center','Path','PreviousCenter','Location','best')
 end
 
 end
