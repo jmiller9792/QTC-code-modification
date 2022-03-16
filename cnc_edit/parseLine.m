@@ -115,6 +115,11 @@ for i = 1:length(programLine)
                 lineStruct.coord.K = getVal2(programLine,j);
             end
         end
+        if isfield(lineStruct.coord,'I')||isfield(lineStruct.coord,'J')||isfield(lineStruct.coord,'K')
+            if ~(strcmp(lineStruct.type,'cwCircle')||strcmp(lineStruct.type,'ccwCircle'))
+                error([num2str(lineStruct.lineNum),': G02 or G03 should be specified for circle'])
+            end
+        end
     elseif programLine(i) == 'M'
         mCode = getCodeNum(programLine,i);
         lineStruct.type = 'mCode';
