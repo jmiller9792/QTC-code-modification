@@ -1,7 +1,7 @@
 % clc
 % clear
 % close all
-function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues)
+function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues,feedScale)
 % cd Z:\equip\QTC\Programs
 % addpath('U:\My Documents\GitHub\QTC-code-modification')
 % addpath('U:\My Documents\GitHub\QTC-code-modification\cnc_edit')
@@ -9,7 +9,7 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % addpath('C:\Users\jmill\OneDrive - purdue.edu\Documents\GitHub\QTC-code-modification')
 % addpath('C:\Users\jmill\OneDrive - purdue.edu\Documents\GitHub\QTC-code-modification\cnc_edit')
 
-% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[])
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1)
 
 
 % To be added:
@@ -47,9 +47,19 @@ lastCoord.X = 0;
 lastCoord.Y = 0;
 lastCoord.Z = 0;
 circInterpLast = [];
+
 for i = 1:length(progLines)
     temp = parseLine(progLines{i});
     lineStruct(i) = temp;
+    
+    if ~isempty(lineStruct(i).feed)
+        lineStruct(i).feed = feedScale*lineStruct(i).feed; % Scale feed
+        if lineStruct(i).feed>18000 % implement maximum
+            lineStruct(i).lineNum
+            lineStruct(i).feed = 18000
+        end 
+    end
+    
     
     % if line assigns circular interpolation, store for following lines.
     % If not yet specified, assign xy circular by default
@@ -91,6 +101,7 @@ for i = 1:length(progLines)
         % Save current coordinate to be available for next line
         lastCoord = lineStruct(i).coord;
     end
+    
 end
 disp('Program split into lines')    
 %% Correct Line Numbers (Only uncommented lines. may not even be necessary in QTC)
