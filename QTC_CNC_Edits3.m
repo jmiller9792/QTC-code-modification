@@ -1,7 +1,13 @@
 % clc
 % clear
 % close all
-function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues,feedScale)
+function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues,feedScale,flipAxis,flipValue)
+% Run set working directories program first
+
+% Call function using following command examples
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['X'],[20],1,'',0)
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1,'',0) 
+
 % cd Z:\equip\QTC\Programs
 % addpath('U:\My Documents\GitHub\QTC-code-modification')
 % addpath('U:\My Documents\GitHub\QTC-code-modification\cnc_edit')
@@ -9,24 +15,7 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % addpath('C:\Users\jmill\OneDrive - purdue.edu\Documents\GitHub\QTC-code-modification')
 % addpath('C:\Users\jmill\OneDrive - purdue.edu\Documents\GitHub\QTC-code-modification\cnc_edit')
 
-% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1)
-
-
-% To be added:
-%    Use same function for c consistency as for offset correction?
-
-%Paths for files and functions
-% addpath('cnc_edit');
-% addpath('Z:\equip\QTC\Programming_Editors\latestQTCprgs');
-
-% %import file to be altered
-% originalFileName = 'nxasbc_57.prg';
-% modifiedFileName = 'asbc_57.prg'; % doesn't matter which prefix, both will be written
-
 %changes
-% lineNumbering = 0;
-% cConsistency = 0;
-% offsetCorrBool = 0;
 disp('Reading File')
 prog = fileread(originalFileName);
 disp('File successfully read')
@@ -103,7 +92,25 @@ for i = 1:length(progLines)
     end
     
 end
-disp('Program split into lines')    
+disp('Program split into lines')
+% %% mirror program
+% if ~isempty(flipAxis)
+%     if strcmp(flipAxis,'X')
+%         
+%     for i = 1:length(lineStruct)
+%         if ~isfield(lineStruct(i).coord,flipAxis)
+%             
+%             
+%         end
+%         if ~isfield(lineStruct(i).lastCoord,flipAxis)
+%             
+%         end
+%         if ~isempty(lineStruct(i).gNum)
+%             if strcmp(lineStruct(i).gNum,'17')
+%             elseif strcmp(lineStruct(i).gNum,'18')
+%             elseif strcmp(lineStruct(i).gNum,'19')
+%             end
+% end
 %% Correct Line Numbers (Only uncommented lines. may not even be necessary in QTC)
 if lineNumbering
     lineNum = 0;
