@@ -4,6 +4,9 @@
 function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues,feedScale,flipAxis,flipValue)
 % Run set working directories program first
 
+% Flip axis is axis to be flipped about, other is the values of what will
+% be flipped
+
 % Call function using following command examples
 % QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['X'],[20],1,'',0)
 % QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1,'',0) 
@@ -93,24 +96,29 @@ for i = 1:length(progLines)
     
 end
 disp('Program split into lines')
-% %% mirror program
-% if ~isempty(flipAxis)
-%     if strcmp(flipAxis,'X')
-%         
-%     for i = 1:length(lineStruct)
-%         if ~isfield(lineStruct(i).coord,flipAxis)
-%             
-%             
-%         end
-%         if ~isfield(lineStruct(i).lastCoord,flipAxis)
-%             
-%         end
-%         if ~isempty(lineStruct(i).gNum)
-%             if strcmp(lineStruct(i).gNum,'17')
-%             elseif strcmp(lineStruct(i).gNum,'18')
-%             elseif strcmp(lineStruct(i).gNum,'19')
-%             end
-% end
+%% mirror program
+if strcmp(flipAxis,'X') % swap y values
+    error('x axis not implemented yet')
+elseif strcmp(flipAxis,'Y') % swap x values
+    for i = 1:length(lineStruct)
+        if isfield(lineStruct(i).coord.X)
+            lineStruct(i).coord.X = flipValue-(lineStruct(i).coord.X-flipValue);
+        end
+        if strcmp(lineStruct(i).circInterp,'xy')
+            if strcmp(lineStruct(i).gNum,'03')
+                lineStruct(i).gNum = '02';
+            elseif strcmp(lineStruct(i).gNum,'02')
+                lineStruct(i).gNum = '03';
+            end
+        elseif strcmp(lineStruct(i).circInterp,'xz')
+            if strcmp(lineStruct(i).gNum,'03')
+                lineStruct(i).gNum = '02';
+            elseif strcmp(lineStruct(i).gNum,'02')
+                lineStruct(i).gNum = '03';
+            end
+        end
+    end
+end
 %% Correct Line Numbers (Only uncommented lines. may not even be necessary in QTC)
 if lineNumbering
     lineNum = 0;
