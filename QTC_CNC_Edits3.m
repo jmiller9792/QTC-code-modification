@@ -101,8 +101,9 @@ if strcmp(flipAxis,'X') % swap y values
     error('x axis not implemented yet')
 elseif strcmp(flipAxis,'Y') % swap x values
     for i = 1:length(lineStruct)
-        if isfield(lineStruct(i).coord.X)
+        if isfield(lineStruct(i).coord,'X')
             lineStruct(i).coord.X = flipValue-(lineStruct(i).coord.X-flipValue);
+            lineStruct(i).coordLast.X = flipValue-(lineStruct(i).coordLast.X-flipValue);
         end
         if strcmp(lineStruct(i).circInterp,'xy')
             if strcmp(lineStruct(i).gNum,'03')
