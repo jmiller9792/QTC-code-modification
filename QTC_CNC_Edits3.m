@@ -5,7 +5,9 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % Run set working directories program first
 
 % Flip axis is axis to be flipped about, other is the values of what will
-% be flipped
+% be flipped.  C_axisZero is detected from first coordinate (set when first
+% coordinate is specified).  Flip axis SHOULD NOT BE USED if a different
+% calibration check location is used.
 
 % Call function using following command examples
 % QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['X'],[20],1,'',0)
@@ -39,7 +41,7 @@ lastCoord.X = 0;
 lastCoord.Y = 0;
 lastCoord.Z = 0;
 circInterpLast = [];
-
+firstCoord = 1;
 for i = 1:length(progLines)
     temp = parseLine(progLines{i});
     lineStruct(i) = temp;
@@ -65,7 +67,6 @@ for i = 1:length(progLines)
             if isempty(circInterpLast) %and none exists, set default
                 circInterpLast = 'xy';
                 lineStruct(i).circInterp = circInterpLast;
-
             else % otherwise take previous
                 lineStruct(i).circInterp = circInterpLast;
 
@@ -76,9 +77,11 @@ for i = 1:length(progLines)
     end
     
     if ~isempty(lineStruct(i).coord) % if line has coordinate contents, otherwise do not update last coordinate
+        if firstCoord
+            C_axisZero = lineStruct(i).coord.C
+            firstCoord = 0;
+        end
         lineStruct(i).coordLast = lastCoord; % Make previous coordinate accessible to current line (for ciruclar interp
-%         lineStruct(i).coordLast = lastCoord;
-%     	lastCoord = lineStruct(i).coord;
         
         % If coordinate is specified previously but not in current line, add it to current line
         if ~isfield(lineStruct(i).coord,'X')
@@ -97,13 +100,21 @@ for i = 1:length(progLines)
 end
 disp('Program split into lines')
 %% mirror program
+
 if strcmp(flipAxis,'X') % swap y values
     error('x axis not implemented yet')
+    %C_axisZero should be changed to be parallel to X axis
 elseif strcmp(flipAxis,'Y') % swap x values
     for i = 1:length(lineStruct)
         if isfield(lineStruct(i).coord,'X')
             lineStruct(i).coord.X = flipValue-(lineStruct(i).coord.X-flipValue);
             lineStruct(i).coordLast.X = flipValue-(lineStruct(i).coordLast.X-flipValue);
+        end
+        if isfield(lineStruct(i).coord,'C')
+            lineStruct(i).coord.C = C_axisZero-(lineStruct(i).coord.C-C_axisZero);
+        end
+        if isfield(lineStruct(i).coord,'I')
+            lineStruct(i).coord.I = -lineStruct(i).coord.I;
         end
         if strcmp(lineStruct(i).circInterp,'xy')
             if strcmp(lineStruct(i).gNum,'03')
