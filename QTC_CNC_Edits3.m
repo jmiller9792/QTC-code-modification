@@ -37,7 +37,6 @@ end
 disp('Comments adjusted')
 %% Split into lines
 progLines = strtrim(strsplit(prog,'\n'));
-% lastCoord = [];
 lastCoord.X = 0;
 lastCoord.Y = 0;
 lastCoord.Z = 0;
@@ -57,26 +56,29 @@ for i = 1:length(progLines)
             lineStruct(i).feed = 18000
         end 
     end
-    
-%     if isfield(lineStruct(i),comment)
+
     if strcmp(lineStruct(i).type,'comment')
-%         lineStruct(i).tail(1:5)
         if isempty(startWrapIndex)
-            if strcmp(lineStruct(i).tail(2:6),'nWRAP')
-                startWrapIndex = i
+            if strlength(lineStruct(i).tail)>=6 % check comment length (too short of comments present issues)
+                if strcmp(lineStruct(i).tail(2:6),'nWRAP')
+                    startWrapIndex = i;
+                end
             end
         elseif isempty(endWrapIndex) % if start wrap has already been found, search for end wrap
+            if strlength(lineStruct(i).tail)>=9
             if strcmp(lineStruct(i).tail(2:9),'ENDnWRAP')
-                endWrapIndex = i
+                endWrapIndex = i;
+            end
             end
         else
+            if strlength(lineStruct(i).tail)>=8
             if strcmp(lineStruct(i).tail(2:8),'nFINISH')
-                finishWrapIndex = i
+                finishWrapIndex = i;
+            end
             end
         end
-    end
 
-        
+    end  
     
     % if line assigns circular interpolation, store for following lines.
     % If not yet specified, assign xy circular by default
@@ -154,6 +156,37 @@ elseif strcmp(flipAxis,'Y') % swap x values
         end
     end
 end
+
+%% Wraps
+if wraps>1
+    % Move finishing code
+    for i = finishWrapIndex:length(lineStruct)
+        lineStruct((wraps)*(endWrapIndex+1-startWrapIndex)+startWrapIndex+(i-finishWrapIndex))=lineStruct(i);
+    end
+    
+    % Delete extra lines (if previously more than current number of laps)
+    startTrimInd = ...
+        (wraps)*(endWrapIndex+1-startWrapIndex)+startWrapIndex-1+...
+        (length(lineStruct)-(finishWrapIndex-1));
+    if startTrimInd<length(lineStruct)
+        for i = startTrimInd:length(lineStruct)
+            lineStruct(startTrimInd) = [];
+        end
+    end
+    % Copy wrap
+    for j = 2:wraps
+        % Add numbering to labels
+        lineStruct((j-1)*(endWrapIndex+1-startWrapIndex)+startWrapIndex).tail = ...
+            strcat('(',lineStruct(startWrapIndex).tail(2:6),num2str(j));
+        lineStruct((j-1)*(endWrapIndex+1-startWrapIndex)+endWrapIndex).tail = ...
+            strcat('(',lineStruct(endWrapIndex).tail(2:9),num2str(j));
+        % Repeat wrap code
+        for i = startWrapIndex+1:endWrapIndex
+            lineStruct((j-1)*(endWrapIndex+1-startWrapIndex)+i)=lineStruct(i);
+        end
+
+    end
+end
 %% Correct Line Numbers (Only uncommented lines. may not even be necessary in QTC)
 if lineNumbering
     lineNum = 0;
@@ -169,7 +202,7 @@ disp('Line numbers corrected')
 %% Fix C rotations
 % C value can be anything but the machine will move the shortest distance
 % to achieve the rotation up to 180deg
-if cConsistency
+if cConsistency || wraps>1
     disp('Fixing C Rotations')
     c_previous = 0; % Start at C = 0deg
     for i = 1:length(lineStruct)
@@ -198,7 +231,7 @@ end
 %% Create output string\
 disp('Generating ouput string')
 progMod = [];
-if isempty(startWrapIndex)
+% if isempty(startWrapIndex)
     for i = lineStruct
         lineNew = writeLine(i);
         if isempty(progMod)
@@ -207,33 +240,33 @@ if isempty(startWrapIndex)
             progMod = [progMod char(13) char(10) char(lineNew)];
         end
     end
-else
-    %Initial movements
-    for i = 1:startWrapIndex-1
-        lineNew = writeLine(lineStruct(i));
-        if isempty(progMod)
-            progMod = char(lineNew);
-        else
-            progMod = [progMod char(13) char(10) char(lineNew)];
-        end
-    end
-    % specified repititions of wraps
-    for j = 1:wraps
-        lineNew = writeLine(lineStruct(startWrapIndex));
-        progMod = [progMod char(13) char(10) char(lineNew) num2str(j)];
-        for i = startWrapIndex+1:endWrapIndex-1
-            lineNew = writeLine(lineStruct(i));
-            progMod = [progMod char(13) char(10) char(lineNew)];
-        end
-        lineNew = writeLine(lineStruct(endWrapIndex));
-        progMod = [progMod char(13) char(10) char(lineNew) num2str(j)];
-    end
-    % Finishing
-    for i = finishWrapIndex:length(lineStruct)
-        lineNew = writeLine(lineStruct(i));
-        progMod = [progMod char(13) char(10) char(lineNew)];
-    end
-end
+% else
+%     %Initial movements
+%     for i = 1:startWrapIndex-1
+%         lineNew = writeLine(lineStruct(i));
+%         if isempty(progMod)
+%             progMod = char(lineNew);
+%         else
+%             progMod = [progMod char(13) char(10) char(lineNew)];
+%         end
+%     end
+%     % specified repititions of wraps
+%     for j = 1:wraps
+%         lineNew = writeLine(lineStruct(startWrapIndex));
+%         progMod = [progMod char(13) char(10) char(lineNew) num2str(j)];
+%         for i = startWrapIndex+1:endWrapIndex-1
+%             lineNew = writeLine(lineStruct(i));
+%             progMod = [progMod char(13) char(10) char(lineNew)];
+%         end
+%         lineNew = writeLine(lineStruct(endWrapIndex));
+%         progMod = [progMod char(13) char(10) char(lineNew) num2str(j)];
+%     end
+%     % Finishing
+%     for i = finishWrapIndex:length(lineStruct)
+%         lineNew = writeLine(lineStruct(i));
+%         progMod = [progMod char(13) char(10) char(lineNew)];
+%     end
+% end
 %% Apply syntax and filename corrections
 returns = strfind(progMod,10); %carriage returns
 
