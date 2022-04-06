@@ -1,7 +1,8 @@
 % clc
 % clear
 % close all
-function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,offsetIndices,offsetValues,feedScale,flipAxis,flipValue)
+function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cConsistency,...
+    offsetIndices,offsetValues,feedScale,flipAxis,flipValue,wraps)
 % Run set working directories program first
 
 % Flip axis is axis to be flipped about, other is the values of what will
@@ -42,6 +43,9 @@ lastCoord.Y = 0;
 lastCoord.Z = 0;
 circInterpLast = [];
 firstCoord = 1;
+startWrapIndex = [];
+endWrapIndex = [];
+finishWrapIndex = [];
 for i = 1:length(progLines)
     temp = parseLine(progLines{i});
     lineStruct(i) = temp;
@@ -54,6 +58,25 @@ for i = 1:length(progLines)
         end 
     end
     
+%     if isfield(lineStruct(i),comment)
+    if strcmp(lineStruct(i).type,'comment')
+%         lineStruct(i).tail(1:5)
+        if isempty(startWrapIndex)
+            if strcmp(lineStruct(i).tail(2:6),'nWRAP')
+                startWrapIndex = i
+            end
+        elseif isempty(endWrapIndex) % if start wrap has already been found, search for end wrap
+            if strcmp(lineStruct(i).tail(2:9),'ENDnWRAP')
+                endWrapIndex = i
+            end
+        else
+            if strcmp(lineStruct(i).tail(2:8),'nFINISH')
+                finishWrapIndex = i
+            end
+        end
+    end
+
+        
     
     % if line assigns circular interpolation, store for following lines.
     % If not yet specified, assign xy circular by default
@@ -175,15 +198,42 @@ end
 %% Create output string\
 disp('Generating ouput string')
 progMod = [];
-for i = lineStruct
-    lineNew = writeLine(i);
-    if isempty(progMod)
-        progMod = char(lineNew);
-    else
+if isempty(startWrapIndex)
+    for i = lineStruct
+        lineNew = writeLine(i);
+        if isempty(progMod)
+            progMod = char(lineNew);
+        else
+            progMod = [progMod char(13) char(10) char(lineNew)];
+        end
+    end
+else
+    %Initial movements
+    for i = 1:startWrapIndex-1
+        lineNew = writeLine(lineStruct(i));
+        if isempty(progMod)
+            progMod = char(lineNew);
+        else
+            progMod = [progMod char(13) char(10) char(lineNew)];
+        end
+    end
+    % specified repititions of wraps
+    for j = 1:wraps
+        lineNew = writeLine(lineStruct(startWrapIndex));
+        progMod = [progMod char(13) char(10) char(lineNew) num2str(j)];
+        for i = startWrapIndex+1:endWrapIndex-1
+            lineNew = writeLine(lineStruct(i));
+            progMod = [progMod char(13) char(10) char(lineNew)];
+        end
+        lineNew = writeLine(lineStruct(endWrapIndex));
+        progMod = [progMod char(13) char(10) char(lineNew) num2str(j)];
+    end
+    % Finishing
+    for i = finishWrapIndex:length(lineStruct)
+        lineNew = writeLine(lineStruct(i));
         progMod = [progMod char(13) char(10) char(lineNew)];
     end
 end
-
 %% Apply syntax and filename corrections
 returns = strfind(progMod,10); %carriage returns
 
