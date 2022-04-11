@@ -11,8 +11,8 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % calibration check location is used.
 
 % Call function using following command examples
-% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['X'],[20],1,'',0)
-% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1,'',0) 
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['C'],[Cnew-Cold],1,'',0,1)
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1,'',0,1) 
 
 % cd Z:\equip\QTC\Programs
 % addpath('U:\My Documents\GitHub\QTC-code-modification')
@@ -61,19 +61,19 @@ for i = 1:length(progLines)
         if isempty(startWrapIndex)
             if strlength(lineStruct(i).tail)>=6 % check comment length (too short of comments present issues)
                 if strcmp(lineStruct(i).tail(2:6),'nWRAP')
-                    startWrapIndex = i;
+                    startWrapIndex = i
                 end
             end
         elseif isempty(endWrapIndex) % if start wrap has already been found, search for end wrap
             if strlength(lineStruct(i).tail)>=9
             if strcmp(lineStruct(i).tail(2:9),'ENDnWRAP')
-                endWrapIndex = i;
+                endWrapIndex = i
             end
             end
         else
             if strlength(lineStruct(i).tail)>=8
             if strcmp(lineStruct(i).tail(2:8),'nFINISH')
-                finishWrapIndex = i;
+                finishWrapIndex = i
             end
             end
         end
@@ -161,16 +161,17 @@ end
 if wraps>1
     % Move finishing code
     for i = finishWrapIndex:length(lineStruct)
+        [i,(wraps)*(endWrapIndex+1-startWrapIndex)+startWrapIndex+(i-finishWrapIndex)]
         lineStruct((wraps)*(endWrapIndex+1-startWrapIndex)+startWrapIndex+(i-finishWrapIndex))=lineStruct(i);
     end
-    
+    lineStruct(103).tail
     % Delete extra lines (if previously more than current number of laps)
     startTrimInd = ...
         (wraps)*(endWrapIndex+1-startWrapIndex)+startWrapIndex-1+...
         (length(lineStruct)-(finishWrapIndex-1));
     if startTrimInd<length(lineStruct)
         for i = startTrimInd:length(lineStruct)
-            lineStruct(startTrimInd) = [];
+            lineStruct(startTrimInd) = []
         end
     end
     % Copy wrap
@@ -182,11 +183,13 @@ if wraps>1
             strcat('(',lineStruct(endWrapIndex).tail(2:9),num2str(j));
         % Repeat wrap code
         for i = startWrapIndex+1:endWrapIndex
+            [i,(j-1)*(endWrapIndex+1-startWrapIndex)+i]
             lineStruct((j-1)*(endWrapIndex+1-startWrapIndex)+i)=lineStruct(i);
         end
 
     end
 end
+lineStruct(103).tail
 %% Correct Line Numbers (Only uncommented lines. may not even be necessary in QTC)
 if lineNumbering
     lineNum = 0;
@@ -232,14 +235,14 @@ end
 disp('Generating ouput string')
 progMod = [];
 % if isempty(startWrapIndex)
-    for i = lineStruct
-        lineNew = writeLine(i);
-        if isempty(progMod)
-            progMod = char(lineNew);
-        else
-            progMod = [progMod char(13) char(10) char(lineNew)];
-        end
+for i = lineStruct
+    lineNew = writeLine(i);
+    if isempty(progMod)
+        progMod = char(lineNew);
+    else
+        progMod = [progMod char(13) char(10) char(lineNew)];
     end
+end
 % else
 %     %Initial movements
 %     for i = 1:startWrapIndex-1
