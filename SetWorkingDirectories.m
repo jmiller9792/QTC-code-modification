@@ -1,6 +1,6 @@
 
 computer = 'JDMLaptop';
-computer = 'Home';
+computer = 'Purdue';
 cd Z:\equip\QTC\Programs
 
 if strcmp(computer,'JDMLaptop')

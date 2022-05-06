@@ -11,8 +11,10 @@ function [] = QTC_CNC_Edits3(originalFileName,modifiedFileName,lineNumbering,cCo
 % calibration check location is used.
 
 % Call function using following command examples
-% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['C'],[Cnew-Cold],1,'',0,1)
-% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1,'',0,1) 
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,['C'],[Cnew-Cold],1,'',0,1)  c correction
+% QTC_CNC_Edits3('nxasbc_57.prg','test.prg',0,0,[],[],1,'',0,1) minimal changes
+% QTC_CNC_Edits3('asbc_74b.prg','ands1.prg',1,1,[],[],1,'Y',-496,1) flip about y axis (x reversed)
+% QTC_CNC_Edits3('ands1a.prg','ands1a.prg',1,1,[],[],1,'',0,1)
 
 % cd Z:\equip\QTC\Programs
 % addpath('U:\My Documents\GitHub\QTC-code-modification')
